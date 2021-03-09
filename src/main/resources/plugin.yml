@@ -1,0 +1,13 @@
+name: ToiletSystem
+version: ${project.version}
+main: ru.bruhabruh.Main
+api-version: 1.16
+authors: [ BruhaBruh ]
+description: Toilet Sytem
+commands:
+  poop:
+    description: To poop
+    usage: /poop
+  pee:
+    description: To pee
+    usage: /pee
