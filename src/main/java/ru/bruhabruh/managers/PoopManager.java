@@ -1,8 +1,10 @@
 package ru.bruhabruh.managers;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -33,6 +35,34 @@ public class PoopManager {
         }
     }
 
+    public static void tryToPoop(Player player, ItemStack item) {
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 3*20, 10));
+        Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
+            @Override
+            public void run() {
+                removePlayerFromUrgeToPoop(player);
+                List<Entity> entities = player.getNearbyEntities(10, 10, 10);
+                entities.add(player); // Чтобы игроку тоже выводило
+                for (Entity entity : entities) {
+                    if (entity instanceof Player) {
+                        entity.sendMessage(ChatColor.GOLD
+                                + String.format("%s вытер попу бумажкой", player.getName())); // TODO Можно поменять на /try
+                    }
+                }
+                if (Math.random() < 0.1) {
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 5*20, 1));
+                    for (Entity entity : entities) {
+                        if (entity instanceof Player) {
+                            entity.sendMessage(ChatColor.GOLD
+                                    + String.format("Во время вытерания попы бумажка у %s порвалась!", player.getName()));
+                        }
+                    }
+                }
+                item.setAmount(item.getAmount()-1);
+            }
+        }, 3*20);
+    }
+
     public static void setEffectByValue(Player player, int value) {
         if (value > 6) {
             player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 10*20, 2));
@@ -57,7 +87,7 @@ public class PoopManager {
         if (UrgeToPoopPlayers.containsKey(player)) { // При наличии игрока добавляет ему ещё 1
             UrgeToPoopPlayers.put(player, UrgeToPoopPlayers.get(player)+1);
         } else {
-            UrgeToPoopPlayers.put(player, 0);
+            UrgeToPoopPlayers.put(player, 1);
         }
         startAddUrgeToPoopPercentToPlayer(player);
     }

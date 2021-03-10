@@ -1,5 +1,6 @@
 package ru.bruhabruh.managers;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -31,6 +32,34 @@ public class PeeManager  {
         }
     }
 
+    public static void tryToPee(Player player) {
+        player.sendMessage(UrgeToPeePlayers.toString());
+        if (!hasPlayerInMap(player)) { player.sendMessage("Вы не хотите писать!"); return; }
+        removePlayerFromUrgeToPee(player);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 3*20, 10));
+        Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new Runnable() {
+            @Override
+            public void run() {
+                List<Entity> entities = player.getNearbyEntities(10, 10, 10);
+                entities.add(player); // Чтобы игрок тоже видел сообщение
+                if (Math.random() < 0.1) {
+                    for (Entity entity : entities) {
+                        if (entity instanceof Player) {
+                            entity.sendMessage(ChatColor.GOLD
+                                    + String.format("%s, пока писал и попал себе на ногу", player.getName()));
+                        }
+                    }
+                } else {
+                    for (Entity entity : entities) {
+                        if (entity instanceof Player) {
+                            entity.sendMessage(ChatColor.GOLD + String.format("%s пописал!", player.getName()));
+                        }
+                    }
+                }
+            }
+        }, 3*20);
+    }
+
     public static void removePlayerFromUrgeToPee(Player player) {
         UrgeToPeePlayers.remove(player);
     }
@@ -43,9 +72,10 @@ public class PeeManager  {
         if (UrgeToPeePlayers.containsKey(player)) { // При наличии игрока добавляет ему ещё 1
             UrgeToPeePlayers.put(player, UrgeToPeePlayers.get(player)+1);
         } else {
-            UrgeToPeePlayers.put(player, 0);
+            UrgeToPeePlayers.put(player, 1);
         }
         startAddUrgeToPoopPercentToPlayer(player);
+        player.sendMessage(UrgeToPeePlayers.toString());
     }
 
     private static void startAddUrgeToPoopPercentToPlayer(Player player) {  // РАЗ В минуту увеличивает на 1
