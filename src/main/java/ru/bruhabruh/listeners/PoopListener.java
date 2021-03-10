@@ -1,12 +1,16 @@
 package ru.bruhabruh.listeners;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import ru.bruhabruh.managers.PoopManager;
 
 import java.util.Objects;
@@ -16,12 +20,11 @@ public class PoopListener implements Listener {
     @EventHandler
     public void onPlayerOvereats(FoodLevelChangeEvent event) {
         if (event.getItem() == null) { return; } // Если игрок СЪЕЛ еду, а не проголодался
+        double chance = 0.2;
         Player player = (Player) event.getEntity();
-        if (event.getFoodLevel() > 20 && Math.random() < 0.2) { // Если ножек АБСТРАКТНО больше 10 и 20% что захочешь какать. Переедание
-            player.sendMessage("Переедание!");
+        chance += 0.1 * (event.getFoodLevel() - 20); // +10% если ножек больше на 1 чем видно игроку
+        if (event.getFoodLevel() > 20 && Math.random() < chance) { // Если ножек АБСТРАКТНО больше 10 и 20% что захочешь какать. Переедание
             PoopManager.addPlayerToUrgeToPoop(player);
-        } else {
-            player.sendMessage("NO");
         }
     }
 

@@ -12,7 +12,6 @@ public class PeeCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) { sender.sendMessage("Вы должны быть игроком!"); return true; }
         PeeManager.tryToPee(((Player) sender).getPlayer());
-
         return true;
     }
 }
